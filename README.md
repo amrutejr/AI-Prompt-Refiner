@@ -1,1 +1,1 @@
-# AI-Prompt-Refiner
+# AI Prompt Refiner Chrome Extension
