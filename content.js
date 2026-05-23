@@ -1,4 +1,36 @@
 console.log("On the Expected Page")
+const API_KEY = ""
+
+async function getGroqChatCompletion(message) {
+
+    const response = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${API_KEY}`
+            },
+
+            body: JSON.stringify({
+                model: "openai/gpt-oss-20b",
+                messages: [
+                    {
+                        role: "user",
+                        content: message
+                    }
+                ]
+            })
+        }
+    )
+
+    const data = await response.json()
+
+    console.log(data)
+
+    return data.choices[0].message.content
+}
+
 let observer = new MutationObserver(()=>{
     const targetInput = document.querySelector('div[role="textbox"]')
     if (targetInput){
@@ -25,11 +57,15 @@ let observer = new MutationObserver(()=>{
         button.style.zIndex = "9999"
         parent.appendChild(button)
 
-        button.addEventListener("click", () => {
+        button.addEventListener("click", async () => {
             const typedText = targetInput.textContent
-            if (typedText){
-                console.log(`User typed : ${typedText}`)
-            }
+            if (!typedText) return
+            console.log(`User typed : ${typedText}`)
+            const refinedPrompt = await getGroqChatCompletion(
+                `Improve this AI prompt professionally:\n\n${typedText} *just return the prompt no other irrelavant text as this is going into an ai agent yet give the prompt in detail*`
+            )
+            console.log(refinedPrompt)
+            targetInput.textContent = refinedPrompt
         })
 
     }
